@@ -13,7 +13,11 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+      POSTGRE_DATABASE_URL: ${{ secrets.POSTGRE_DATABASE_URL }}
+      MONGO_DATABASE_URL: ${{ secrets.MONGO_DATABASE_URL }}
+      MONGO_DATABASE_NAME: ${{ secrets.MONGO_DATABASE_NAME }}
+      GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
