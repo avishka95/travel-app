@@ -6,13 +6,19 @@ name: Node.js CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     env:
       POSTGRE_DATABASE_URL: ${{ secrets.POSTGRE_DATABASE_URL }}
       MONGO_DATABASE_URL: ${{ secrets.MONGO_DATABASE_URL }}
@@ -24,13 +30,23 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         cache-dependency-path: backend/package-lock.json
+        
+    - name: Create .env file for dotenv
+      run: |
+          echo "POSTGRE_DATABASE_URL=${{ secrets.POSTGRE_DATABASE_URL }}" >> .env
+          echo "MONGO_DATABASE_URL=${{ secrets.MONGO_DATABASE_URL }}" >> .env
+          echo "MONGO_DATABASE_NAME=${{ secrets.MONGO_DATABASE_NAME }}" >> .env
+          echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" >> .env
+          
     - run: npm ci
       working-directory: ./backend
     - run: npm run build --if-present
